@@ -1,0 +1,12 @@
+{
+  "name": "meet-audio-bridge",
+  "version": "1.0.0",
+  "description": "Lightweight audio bridge for Google Meet on MacBook to Pi",
+  "main": "bridge.js",
+  "scripts": {
+    "start": "node bridge.js"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
+  }
+}
