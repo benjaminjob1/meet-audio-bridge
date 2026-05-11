@@ -34,25 +34,67 @@ jobs:
 
       - name: Create installer + README
         run: |
-          cat > dist/install.sh << 'EOF'
+          cat > dist/install.sh << 'INSTALL_EOF'
           #!/bin/bash
-          echo "🎙️ Installing Meet Audio Bridge..."
+          echo "🎙️ Meet Audio Bridge Installer"
+          echo "=============================="
+          echo ""
+
+          # Check if BlackHole is installed
+          if [ -d "/Library/Extensions/BlackHole.v" ]; then
+            echo "✅ BlackHole audio driver is installed"
+          else
+            echo "⚠️  BlackHole audio driver is NOT installed"
+            echo ""
+            echo "BlackHole is required for Meet Audio Bridge to work."
+            echo ""
+
+            # Check if brew is available
+            if command -v brew &> /dev/null; then
+              echo "🍺 Brew detected - would you like to install BlackHole now?"
+              echo "   Run: brew install blackhole-2ch"
+              echo ""
+              read -p "Install BlackHole via brew? (y/n): " -n 1 -r; echo
+              if [[ $REPLY =~ ^[Yy]$ ]]; then
+                echo "Installing BlackHole..."
+                brew install blackhole-2ch
+                echo "✅ BlackHole installed!"
+                echo "⚠️  You may need to approve in System Settings > Privacy & Security"
+              else
+                echo "Skipping BlackHole install."
+              fi
+            else
+              echo "❌ Brew not found - manual installation required."
+              echo ""
+              read -p "Open BlackHole download page? (y/n): " -n 1 -r; echo
+              if [[ $REPLY =~ ^[Yy]$ ]]; then
+                open "https://existential.audio/blackhole/"
+              fi
+            fi
+          fi
+
+          echo ""
+          echo "📦 Installing Meet Audio Bridge..."
           mkdir -p ~/meet-audio-bridge
           cp -R meet-audio-bridge.app ~/meet-audio-bridge/
           chmod +x ~/meet-audio-bridge/meet-audio-bridge.app/Contents/MacOS/meet-audio-bridge
           echo "✅ Installed to ~/meet-audio-bridge/meet-audio-bridge.app"
+          echo ""
           echo "💡 Run: open ~/meet-audio-bridge/meet-audio-bridge.app"
-          EOF
+          echo ""
+          echo "⚠️  After first run, grant microphone access if prompted."
+          INSTALL_EOF
           chmod +x dist/install.sh
           
-          cat > dist/README.txt << 'EOF'
+          cat > dist/README.txt << 'README_EOF'
           Meet Audio Bridge - macOS
           ===========================
           1. Install BlackHole: https://existential.audio/blackhole/
+             - Or run: brew install blackhole-2ch (if brew installed)
           2. Run: open meet-audio-bridge.app
           3. Enter Pi Tailscale IP when prompted
           4. In Google Meet, use BlackHole as microphone
-          EOF
+          README_EOF
 
       - name: Create zip for release
         run: |
