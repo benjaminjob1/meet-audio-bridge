@@ -64,8 +64,6 @@ jobs:
           create-dmg \
             --volname "Meet Audio Bridge" \
             --window-size 500 350 \
-            --icon-size 100 \
-            --icon "meet-audio-bridge.app" 150 150 \
             "dist/Meet-Audio-Bridge.dmg" \
             "dist/meet-audio-bridge.app/"
           ls -la dist/
