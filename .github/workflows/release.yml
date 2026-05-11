@@ -30,7 +30,7 @@ jobs:
         run: |
           pkg bridge.js --targets node18-macos-x64 --output meet-audio-bridge.app
           mkdir -p dist
-          mv meet-audio-bridge.app dist/
+          cp -R meet-audio-bridge.app dist/
 
       - name: Create installer + README
         run: |
@@ -54,10 +54,22 @@ jobs:
           4. In Google Meet, use BlackHole as microphone
           EOF
 
-      - name: Upload Release Asset
+      - name: Upload macOS .app
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/meet-audio-bridge.app
+          asset_name: meet-audio-bridge.app
+          asset_content_type: application/octet-stream
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload installer
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/*
+          files: |
+            dist/install.sh
+            dist/README.txt
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
