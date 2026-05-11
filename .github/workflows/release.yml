@@ -54,11 +54,15 @@ jobs:
           4. In Google Meet, use BlackHole as microphone
           EOF
 
+      - name: Create zip for release
+        run: |
+          cd dist && zip -r meet-audio-bridge.app.zip meet-audio-bridge.app
+
       - name: Upload all files to Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/meet-audio-bridge.app
+            dist/meet-audio-bridge.app.zip
             dist/install.sh
             dist/README.txt
           generate_release_notes: true
