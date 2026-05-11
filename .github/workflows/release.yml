@@ -23,32 +23,42 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install pkg
+        run: npm install -g pkg
 
       - name: Build .app bundle
         run: |
-          npm install -g pkg
-          pkg bridge.js --targets node18-macos-x64 --output meet-audio-bridge
+          pkg bridge.js --targets node18-macos-x64 --output meet-audio-bridge.app
           mkdir -p dist
-          mv meet-audio-bridge dist/
+          mv meet-audio-bridge.app dist/
 
-      - name: Create installer script
+      - name: Create installer + README
         run: |
           cat > dist/install.sh << 'EOF'
           #!/bin/bash
           echo "🎙️ Installing Meet Audio Bridge..."
           mkdir -p ~/meet-audio-bridge
-          cp meet-audio-bridge ~/meet-audio-bridge/
-          chmod +x ~/meet-audio-bridge/meet-audio-bridge
-          echo "✅ Installed! Run with: ~/meet-audio-bridge/meet-audio-bridge <pi-ip>"
+          cp -R meet-audio-bridge.app ~/meet-audio-bridge/
+          chmod +x ~/meet-audio-bridge/meet-audio-bridge.app/Contents/MacOS/meet-audio-bridge
+          echo "✅ Installed to ~/meet-audio-bridge/meet-audio-bridge.app"
+          echo "💡 Run: open ~/meet-audio-bridge/meet-audio-bridge.app"
           EOF
           chmod +x dist/install.sh
+          
+          cat > dist/README.txt << 'EOF'
+          Meet Audio Bridge - macOS
+          ===========================
+          1. Install BlackHole: https://existential.audio/blackhole/
+          2. Run: open meet-audio-bridge.app
+          3. Enter Pi Tailscale IP when prompted
+          4. In Google Meet, use BlackHole as microphone
+          EOF
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
         with:
           files: dist/*
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -65,12 +75,13 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install dependencies + pkg
+        run: |
+          npm install
+          npm install -g pkg
 
       - name: Build binary
         run: |
-          npm install -g pkg
           pkg bridge.js --targets node18-linux-x64 --output meet-audio-bridge
           tar -czvf meet-audio-bridge-linux.tar.gz meet-audio-bridge
 
@@ -78,5 +89,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: meet-audio-bridge-linux.tar.gz
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
