@@ -58,11 +58,24 @@ jobs:
         run: |
           cd dist && zip -r meet-audio-bridge.app.zip meet-audio-bridge.app
 
+      - name: Create DMG
+        run: |
+          brew install create-dmg
+          create-dmg \
+            --volname "Meet Audio Bridge" \
+            --window-size 500 350 \
+            --icon-size 100 \
+            --icon "meet-audio-bridge.app" 150 150 \
+            dist/meet-audio-bridge.app.zip \
+            "dist/Meet-Audio-Bridge.dmg"
+          ls -la dist/
+
       - name: Upload all files to Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             dist/meet-audio-bridge.app.zip
+            dist/Meet-Audio-Bridge.dmg
             dist/install.sh
             dist/README.txt
           generate_release_notes: true
