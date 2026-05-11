@@ -49,10 +49,24 @@ jobs:
             echo "BlackHole is required for Meet Audio Bridge to work."
             echo ""
 
-            # Check if brew is available
+            # Check if brew is available, ask to install first
             if command -v brew &> /dev/null; then
-              echo "🍺 Brew detected - would you like to install BlackHole now?"
-              echo "   Run: brew install blackhole-2ch"
+              echo "🍺 Brew is available."
+            else
+              echo "🍺 Brew not detected on this system."
+              echo ""
+              read -p "Install Brew first, then BlackHole? (y/n): " -n 1 -r; echo
+              if [[ $REPLY =~ ^[Yy]$ ]]; then
+                echo "Installing Brew..."
+                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+                echo "✅ Brew installed!"
+              else
+                echo "Skipping Brew install."
+              fi
+            fi
+
+            # Now check again if brew is available and offer BlackHole
+            if command -v brew &> /dev/null; then
               echo ""
               read -p "Install BlackHole via brew? (y/n): " -n 1 -r; echo
               if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -64,8 +78,8 @@ jobs:
                 echo "Skipping BlackHole install."
               fi
             else
-              echo "❌ Brew not found - manual installation required."
               echo ""
+              echo "❌ Brew not available - manual installation required."
               read -p "Open BlackHole download page? (y/n): " -n 1 -r; echo
               if [[ $REPLY =~ ^[Yy]$ ]]; then
                 open "https://existential.audio/blackhole/"
